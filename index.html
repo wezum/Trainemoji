@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Delay D">
   <meta name="theme-color" content="#fbf3e4">
-  <title>Delay Defence Force</title>
+  <title>Train Emoji 🚂</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230e0f13'/><text y='.9em' font-size='78'>🛡️</text></svg>">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -20,7 +20,7 @@
     <header id="topbar">
       <div class="brand">
         <span class="brand-mark">🛡️</span>
-        <span class="brand-name">Delay Defence Force</span>
+        <span class="brand-name">Train Emoji 🚂</span>
       </div>
       <div id="stats">
         <span class="pill" id="stat-money" title="Snack money">💰 <b>0</b></span>
@@ -29,9 +29,35 @@
       </div>
       <div class="controls">
         <button class="btn-ghost" id="btn-help" title="How to play">?</button>
+        <button class="btn-ghost" id="btn-mute" title="Audio settings">🔊</button>
         <button class="btn-ghost" id="btn-speed" title="Game speed">×1</button>
         <button class="btn-ghost" id="btn-pause" title="Pause">⏸</button>
       </div>
+
+      <dialog id="audiosettings">
+        <div class="audiosettings-header">
+          <h3>Audio</h3>
+          <button class="btn-ghost" id="btn-audio-close">Close</button>
+        </div>
+        <div class="audiosettings-body">
+          <div class="volrow">
+            <label>Master <span id="val-master">100%</span></label>
+            <input type="range" id="slider-master" min="0" max="100" value="100">
+          </div>
+          <div class="volrow">
+            <label>Music <span id="val-music">100%</span></label>
+            <input type="range" id="slider-music" min="0" max="100" value="100">
+          </div>
+          <div class="volrow">
+            <label>SFX <span id="val-sfx">100%</span></label>
+            <input type="range" id="slider-sfx" min="0" max="100" value="100">
+          </div>
+          <div class="volrow mute">
+            <label>Mute all</label>
+            <button class="btn ghost" id="btn-audio-mute">🔊</button>
+          </div>
+        </div>
+      </dialog>
     </header>
 
     <section id="board">
@@ -65,5 +91,6 @@
   <dialog id="modal"></dialog>
 
   <script src="game.js"></script>
+  <script src="audio.js"></script>
 </body>
 </html>

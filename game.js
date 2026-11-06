@@ -465,6 +465,8 @@ function startWave() {
   const bar = $("wavebar");
   bar.classList.add("wave-flash");
   requestAnimationFrame(() => bar.classList.remove("wave-flash"));
+  Audio.waveStart();
+  Audio.bgmStart();
   save();
 }
 
@@ -488,6 +490,7 @@ function endWave() {
     bestWave = state.wave;
     localStorage.setItem(LS_BEST, String(bestWave));
   }
+  Audio.bgmStop();
   Audio.waveClear();
   floatyAt(4, `+💰${bonus} wave clear`, "cash");
   save();
@@ -632,11 +635,41 @@ $("btn-pause").addEventListener("click", (e) => {
 });
 
 $("btn-help").addEventListener("click", showHowTo);
-$("btn-mute").addEventListener("click", (e) => {
-  const now = Audio.toggle();
-  e.currentTarget.textContent = now ? "🔇" : "🔊";
-  e.currentTarget.title = now ? "Unmute audio" : "Mute audio";
+const audioDialog = $("audiosettings");
+const audioMuteBtn = $("btn-audio-mute");
+const audioCloseBtn = $("btn-audio-close");
+
+function refreshAudioLabels() {
+  $("val-master").textContent = Math.round(Audio.master * 100) + "%";
+  $("val-music").textContent = Math.round(Audio.music * 100) + "%";
+  $("val-sfx").textContent = Math.round(Audio.sfx * 100) + "%";
+  audioMuteBtn.textContent = Audio.muted ? "🔇" : "🔊";
+  audioMuteBtn.title = Audio.muted ? "Unmute all" : "Mute all";
+}
+
+$("btn-mute").addEventListener("click", () => {
   Audio.uiClick();
+  refreshAudioLabels();
+  audioDialog.showModal();
+});
+
+audioCloseBtn.addEventListener("click", () => audioDialog.close());
+
+$("slider-master").addEventListener("input", (e) => {
+  Audio.setMaster(e.target.valueAsNumber / 100);
+  refreshAudioLabels();
+});
+$("slider-music").addEventListener("input", (e) => {
+  Audio.setMusic(e.target.valueAsNumber / 100);
+  refreshAudioLabels();
+});
+$("slider-sfx").addEventListener("input", (e) => {
+  Audio.setSfx(e.target.valueAsNumber / 100);
+  refreshAudioLabels();
+});
+audioMuteBtn.addEventListener("click", () => {
+  Audio.toggle();
+  refreshAudioLabels();
 });
 
 /* unlock audio context on first gesture (iOS requirement) */

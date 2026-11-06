@@ -377,3 +377,33 @@ dialog::backdrop { background: rgba(53, 41, 26, .45); }
   .pill.pop, #wavebar.wave-flash { animation: none; }
   .lane-shake, #seat.critical { animation: none; }
 }
+
+/* ---------- audio settings dialog ---------- */
+#audiosettings {
+  padding: 0;
+}
+#audiosettings .audiosettings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line-2);
+}
+#audiosettings h3 { margin: 0; font-size: 16px; font-weight: 800; }
+#audiosettings .audiosettings-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+#audiosettings .volrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+#audiosettings .volrow label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-dim);
+  width: 70px;
+}
+#audiosettings .volrow span { font-variant-numeric: tabular-nums; min-width: 40px; text-align: right; }
+#audiosettings .volrow input[type="range"] { flex: 1; height: 6px; accent-color: var(--accent); }
+#audiosettings .volrow.mute { flex-direction: row; align-items: center; gap: 10px; }
+#audiosettings .volrow.mute label { width: auto; }
+#audiosettings .volrow.mute button { padding: 7px 12px; }
