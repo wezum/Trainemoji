@@ -368,6 +368,46 @@ dialog::backdrop { background: rgba(53, 41, 26, .45); }
   #topbar { flex-wrap: nowrap; }
 }
 
+@media (max-width: 699px) {
+  #topbar {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+  }
+  .brand {
+    flex: none;
+    justify-content: center;
+    gap: 6px;
+  }
+  .brand-name {
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 55vw;
+  }
+  #stats {
+    flex: none;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+  }
+  #topbar .pill {
+    font-size: 12px;
+    padding: 4px 9px;
+  }
+  .controls {
+    flex: none;
+    gap: 5px;
+    justify-content: center;
+  }
+  .btn-ghost {
+    padding: 4px 9px;
+    font-size: 14px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .bore .face { transition: none; animation: none; }
   .floaty, #snack { animation: none; }
