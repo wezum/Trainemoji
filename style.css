@@ -510,3 +510,51 @@ body.theme-alpine .layer-near { background: repeating-linear-gradient(0deg, #4fc
 #audiosettings .volrow.mute { flex-direction: row; align-items: center; gap: 10px; }
 #audiosettings .volrow.mute label { width: auto; }
 #audiosettings .volrow.mute button { padding: 7px 12px; }
+
+/* ---------- shop closed during wave ---------- */
+#shop.closed { opacity: .55; filter: grayscale(.35); pointer-events: none; }
+#shop-closed {
+  display: none;
+  grid-column: 1 / -1;
+  background: rgba(229, 68, 68, .92);
+  color: #fff;
+  text-align: center;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  font-weight: 800;
+  letter-spacing: .2px;
+  font-size: 14px;
+  margin-top: 8px;
+}
+#shop.closed ~ #shop-closed { display: block; }
+
+/* ---------- landscape orientation ---------- */
+@media (orientation: landscape) and (max-width: 1000px) {
+  #app { flex-direction: row; gap: 10px; align-items: stretch; }
+  #board { flex: 1 1 auto; min-width: 0; }
+  #lane-wrap { flex: 1; min-width: 0; }
+  #lane { height: auto; min-height: 150px; max-height: 22vh; }
+  #shop {
+    width: 210px;
+    flex-shrink: 0;
+    overflow-y: auto;
+    flex-direction: column;
+    gap: 8px;
+    padding-right: 4px;
+  }
+  .shop-item {
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    text-align: left;
+  }
+  .shop-item .face { font-size: 22px; }
+  .shop-item .nm { font-size: 11.5px; }
+  .shop-item .pr { font-size: 11.5px; }
+  .controls { gap: 4px; }
+  #wavebar { flex-direction: row; gap: 10px; align-items: center; }
+  #wave-msg { font-size: 12px; }
+  .btn.big { padding: 8px 14px; font-size: 13px; }
+}

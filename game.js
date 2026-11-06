@@ -201,10 +201,16 @@ function buildShop() {
 }
 
 function renderShop() {
+  const waveActive = phase === "wave";
+  const closed = $("shop-closed");
+  if (closed) closed.hidden = !waveActive;
+  shopEl.classList.toggle("closed", waveActive);
   for (const b of shopEl.children) {
     const key = b.dataset.kind;
-    b.disabled = state.money < KINDS[key].cost && selectedKind !== key;
-    b.classList.toggle("selected", selectedKind === key);
+    const affordable = state.money >= KINDS[key].cost;
+    b.disabled = waveActive || (state.money < KINDS[key].cost && selectedKind !== key);
+    b.title = waveActive ? "Shop closed during wave — place defences between runs" : "";
+    b.classList.toggle("selected", selectedKind === key && !waveActive);
     b.querySelector(".pr").textContent = "💰 " + fmt(KINDS[key].cost);
   }
 }
@@ -216,14 +222,13 @@ function renderSlots() {
     const el = slotEls[i];
     const d = state.slots[i];
     el.classList.toggle("occupied", !!d);
-    el.classList.toggle("selected", selectedSlot === i || (selectedKind && !d));
+    el.classList.toggle("selected", selectedSlot === i);
     if (d) {
       const k = KINDS[d.kind];
       el.innerHTML = `<span class="def">${k.emoji}</span>` + (d.lvl > 1 ? `<i class="lvl">${d.lvl}</i>` : "");
       el.title = `${k.name} · lv ${d.lvl}`;
     } else {
-      const shown = selectedKind ? KINDS[selectedKind] : null;
-      el.innerHTML = `<span class="placeholder">${shown ? shown.emoji : "+"}</span>`;
+      el.innerHTML = `<span class="placeholder">+</span>`;
       el.title = "Empty seat space";
     }
   }
@@ -554,6 +559,7 @@ function startWave() {
   requestAnimationFrame(() => bar.classList.remove("wave-flash"));
   Audio.waveStart();
   Audio.bgmStart();
+  renderShop();
   save();
 }
 
@@ -601,6 +607,7 @@ function gameOver() {
   waveMsg.textContent = "Sanity gone. The track went quiet.";
   waveBtn.disabled = true;
   Audio.gameOver();
+  renderShop();
   showGameOver();
 }
 
@@ -869,6 +876,10 @@ function boot() {
     showHowTo();
   }
   if (restored && !modal.open) showWaveToast();
+  /* try landscape lock on mobile (iOS/Android) — harmless if denied */
+  if (screen.orientation && typeof screen.orientation.lock === "function") {
+    screen.orientation.lock("landscape").catch(() => {});
+  }
   requestAnimationFrame(loop);
 }
 
