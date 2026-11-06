@@ -240,6 +240,24 @@ body {
   100% { border-color: var(--line-2); box-shadow: 0 0 0 16px rgba(232,83,28,0); }
 }
 
+/* ---------- more life ---------- */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+.lane-shake { animation: shake .2s ease both; }
+
+@keyframes seatPulse {
+  0%, 100% { transform: scale(1); border-color: var(--navy); }
+  50% { transform: scale(1.06); border-color: var(--accent); }
+}
+#seat.critical { animation: seatPulse 1s ease-in-out infinite; }
+
+.bore.slowed { filter: drop-shadow(0 0 6px rgba(100, 160, 255, .6)); }
+
+.floaty.dmg { color: var(--bad); font-size: 12px; }
+
 /* ---------- slot panel ---------- */
 #slotpanel {
   background: var(--panel);
@@ -357,4 +375,5 @@ dialog::backdrop { background: rgba(53, 41, 26, .45); }
   .slot { transition: none; }
   .shop-item { transition: none; }
   .pill.pop, #wavebar.wave-flash { animation: none; }
+  .lane-shake, #seat.critical { animation: none; }
 }

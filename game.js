@@ -218,6 +218,7 @@ function onSlotClick(i) {
   const placed = slotEls[i];
   placed.classList.add("place-pop");
   requestAnimationFrame(() => placed.classList.remove("place-pop"));
+  Audio.place();
   renderSlots();
   renderShop();
   updateStats();
@@ -266,6 +267,7 @@ $("btn-upgrade").addEventListener("click", () => {
   state.money -= c;
   d.spent += c;
   d.lvl++;
+  Audio.upgrade();
   renderSlotPanel();
   renderSlots();
   updateStats();
@@ -277,6 +279,7 @@ $("btn-sell").addEventListener("click", () => {
   if (!d) return;
   state.money += Math.round((d.spent || KINDS[d.kind].cost) * 0.5);
   state.slots[selectedSlot] = null;
+  Audio.sell();
   selectedSlotClose();
   updateStats();
   save();
@@ -301,16 +304,30 @@ function spawnBore(kind, n) {
     el,
     hpEl: el.querySelector(".hp i"),
     faceEl: el.querySelector(".face"),
+    entrySlide: true,
   };
   bore.row = bore.id % 3;                                  // three pedestrian rows
   el.style.bottom = (8 + bore.row * 26) + "px";
   el.style.animationDelay = (bore.id * 0.5) + "s";
+  el.style.transform = "translateX(-120px)";
+  el.style.opacity = "0";
+  el.classList.add("entry");
   rowBores.appendChild(el);
   bores.push(bore);
   layoutBore(bore);
 }
 
 function layoutBore(b) {
+  if (b.entrySlide) {
+    b.entrySlide = false;
+    requestAnimationFrame(() => {
+      b.el.style.transition = "transform .4s ease, opacity .4s ease";
+      b.el.style.transform = `translateX(${b.pos * pxPerUnit()}px)`;
+      b.el.style.opacity = "1";
+      setTimeout(() => b.el.classList.remove("entry"), 450);
+    });
+    return;
+  }
   b.el.style.transform = `translateX(${b.pos * pxPerUnit()}px)`;
 }
 function layoutBores() {
@@ -334,6 +351,7 @@ function killBore(b, i) {
   b.el.style.transition = "transform .14s ease, opacity .14s ease";
   b.el.style.transform = "scale(.55)";
   b.el.style.opacity = "0.5";
+  Audio.kill();
 }
 
 function sweepDead() {
@@ -373,7 +391,11 @@ function dpsTick(dt) {
     if (dmg > 0) {
       b.hp -= dmg * dt;
       if (b.hp <= 0) killBore(b, i);
-      else updateHpBar(b);
+      else {
+        updateHpBar(b);
+        const d = Math.max(1, Math.round(dmg * dt));
+        floatyAt(b.pos, `-${d}`, "dmg");
+      }
     }
   }
 }
@@ -382,6 +404,8 @@ function leak(b) {
   state.sanity--;
   seat.classList.add("leak");
   setTimeout(() => seat.classList.remove("leak"), 400);
+  lane.classList.add("lane-shake");
+  setTimeout(() => lane.classList.remove("lane-shake"), 200);
   updateStats();
   if (state.sanity <= 0) gameOver();
 }
@@ -402,6 +426,7 @@ lane.addEventListener("pointerdown", (e) => {
     const b = bores[bi];
     b.hp -= TAP_DMG;
     tapCd = 0.25;
+    Audio.shush();
     b.el.classList.add("hit");
     const f = b.faceEl;
     setTimeout(() => { f && b.el.classList.remove("hit"); }, 130);
@@ -463,6 +488,7 @@ function endWave() {
     bestWave = state.wave;
     localStorage.setItem(LS_BEST, String(bestWave));
   }
+  Audio.waveClear();
   floatyAt(4, `+💰${bonus} wave clear`, "cash");
   save();
   updateStats();
@@ -475,6 +501,7 @@ function gameOver() {
   lane.classList.remove("paused-view");
   waveMsg.textContent = "Sanity gone. The track went quiet.";
   waveBtn.disabled = true;
+  Audio.gameOver();
   showGameOver();
 }
 
@@ -507,6 +534,7 @@ function updateStats() {
   statMoney.textContent = fmt(state.money);
   statSanity.textContent = state.sanity;
   statSanity.parentElement.classList.toggle("hurt", state.sanity <= 3);
+  seat.classList.toggle("critical", state.sanity <= 3);
   renderShop();                      // affordability follows the money, killer by killer
 }
 
@@ -532,6 +560,7 @@ snackEl.addEventListener("pointerdown", () => {
   const bonus = +snackEl.dataset.bonus || 5;
   state.money += bonus;
   snackEl.hidden = true;
+  Audio.goldenSnack();
   updateStats();
   floatyAt(SLOTS / 2, `+💰${bonus} unexpected snack`, "cash");
   save();
@@ -551,6 +580,7 @@ function waveTick(dt) {
     const b = bores[i];
     if (b.dead) continue;
     b.slow = slowForBore(b);
+    b.el.classList.toggle("slowed", b.slow > 0);
     b.pos += BASE_SPEED * b.mul * (1 - b.slow) * dt;
     if (b.pos >= SLOTS + 0.3) {
       b.el.remove();
@@ -602,6 +632,25 @@ $("btn-pause").addEventListener("click", (e) => {
 });
 
 $("btn-help").addEventListener("click", showHowTo);
+$("btn-mute").addEventListener("click", (e) => {
+  const now = Audio.toggle();
+  e.currentTarget.textContent = now ? "🔇" : "🔊";
+  e.currentTarget.title = now ? "Unmute audio" : "Mute audio";
+  Audio.uiClick();
+});
+
+/* unlock audio context on first gesture (iOS requirement) */
+let audioUnlocked = false;
+document.addEventListener(
+  "pointerdown",
+  () => {
+    if (!audioUnlocked) {
+      audioUnlocked = true;
+      Audio.init();
+    }
+  },
+  { once: true }
+);
 
 /* ---------------- modals ---------------- */
 
