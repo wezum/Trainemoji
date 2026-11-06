@@ -21,6 +21,23 @@ const rnd = (a, b) => a + Math.random() * (b - a);
 
 const SLOTS = 9;
 
+/* ---------------- themes & scenes ---------------- */
+
+const THEMES = [
+  { id: "harz-autumn", name: "Harz Autumn",   scenes: 3 },
+  { id: "sakura",      name: "Sakura Spring", scenes: 3 },
+  { id: "alpine",      name: "Alpine",        scenes: 3 },
+];
+
+let themeIdx = 0;
+let sceneIdx = 0;
+
+function applyTheme() {
+  const t = THEMES[themeIdx];
+  document.body.className = `theme-${t.id} scene-${sceneIdx + 1}`;
+  renderSlots();
+}
+
 const KINDS = {
   vendor: { emoji: "🥨", name: "Snack Vendor",   cost: 25,  dps: 3,   range: 1.3, slow: 0,    blurb: "Sells crisps. Hits softly." },
   kid:    { emoji: "🧩", name: "Crossword Kid", cost: 60,  dps: 6,   range: 1.7, slow: 0,    blurb: "7-down, and 7 patience down." },
@@ -36,10 +53,10 @@ const slowFor  = (d) => { const s = KINDS[d.kind].slow; return s ? Math.min(0.85
 const upCost   = (d) => Math.round(KINDS[d.kind].cost * Math.pow(1.9, d.lvl) * 0.9);
 
 const BORES = {
-  commuter: { emoji: "📱", name: "Scroller",      hp: 26,  speed: 1.0,  reward: 8,  mega: false },
-  kid:      { emoji: "👶", name: "Screamer",      hp: 16,  speed: 1.5,  reward: 12, mega: false },
-  podcast:  { emoji: "📞", name: "Podcast Guy",   hp: 80,  speed: 0.72, reward: 26, mega: false },
-  luggage:  { emoji: "🧳", name: "Luggage Bloke", hp: 210, speed: 0.5,  reward: 70, mega: true  },
+  commuter: { emoji: "📱", hurtEmoji: "📵", name: "Scroller",      hp: 26,  speed: 1.0,  reward: 8,  mega: false },
+  kid:      { emoji: "👶", hurtEmoji: "😭",  name: "Screamer",      hp: 16,  speed: 1.5,  reward: 12, mega: false },
+  podcast:  { emoji: "📞", hurtEmoji: "😵",  name: "Podcast Guy",   hp: 80,  speed: 0.72, reward: 26, mega: false },
+  luggage:  { emoji: "🧳", hurtEmoji: "😫",  name: "Luggage Bloke", hp: 210, speed: 0.5,  reward: 70, mega: true  },
 };
 const BASE_SPEED = 0.26;      // slot units per second
 const TAP_DMG = 4;
@@ -111,6 +128,7 @@ for (let i = 0; i < SLOTS; i++) {
 
 function measure() {
   laneW = lane.clientWidth;
+  updateRangePreview();
 }
 addEventListener("resize", () => {
   measure();
@@ -172,7 +190,12 @@ function buildShop() {
       selectedKind = key;
       renderShop();
       renderSlots();
+      showRangePreview(key, 0);
     });
+    b.addEventListener("pointerenter", () => {
+      if (selectedKind !== key) { selectedKind = key; renderShop(); renderSlots(); showRangePreview(key, 0); }
+    });
+    b.addEventListener("pointerleave", hideRangePreview);
     shopEl.appendChild(b);
   }
 }
@@ -397,6 +420,11 @@ function dpsTick(dt) {
         floatyAt(b.pos, `-${d}`, "dmg");
       }
     }
+    // damage face swap below half health
+    b.faceEl.textContent = BORES[b.kind].emoji;
+    if (b.hp / b.max < 0.5 && BORES[b.kind].hurtEmoji) {
+      b.faceEl.textContent = BORES[b.kind].hurtEmoji;
+    }
   }
 }
 
@@ -453,6 +481,64 @@ function floatyAt(pos, text, cls) {
   setTimeout(() => f.remove(), 820);
 }
 
+function spawnParticles(pos) {
+  const cx = pos * pxPerUnit();
+  const baseY = rowBores.clientHeight - 10;
+  const colors = ["#f0a92e", "#e8531c", "#fbf3e4"];
+  for (let k = 0; k < 6; k++) {
+    const p = document.createElement("span");
+    p.className = "particle";
+    p.style.background = colors[k % colors.length];
+    const ang = Math.random() * Math.PI * 2;
+    const dist = 30 + Math.random() * 60;
+    p.style.left = cx + "px";
+    p.style.top = baseY + "px";
+    p.style.setProperty("--tx", Math.cos(ang) * dist + "px");
+    p.style.setProperty("--ty", "-" + (Math.sin(ang) * dist + 10) + "px");
+    rowBores.appendChild(p);
+    setTimeout(() => p.remove(), 620);
+  }
+}
+
+/* ---- defence range preview ---- */
+
+let rangeEl = null;
+let previewPos = null;
+
+function showRangePreview(kindKey, slotIdx) {
+  hideRangePreview();
+  const k = KINDS[kindKey];
+  if (!k.range) return;
+  const r = rangeFor({ kind: kindKey, lvl: 1 });
+  const unit = pxPerUnit();
+  const cx = (slotIdx + 0.5) * unit;
+  const dia = r * unit * 2;
+  rangeEl = document.createElement("div");
+  rangeEl.className = "range-preview";
+  rangeEl.style.width = dia + "px";
+  rangeEl.style.height = dia + "px";
+  rangeEl.style.left = cx + "px";
+  rangeEl.style.top = rowBores.clientHeight / 2 + "px";
+  rowBores.appendChild(rangeEl);
+  previewPos = { kindKey, slotIdx };
+  requestAnimationFrame(() => rangeEl.classList.add("visible"));
+}
+
+function hideRangePreview() {
+  if (rangeEl) { rangeEl.remove(); rangeEl = null; }
+  previewPos = null;
+}
+
+function updateRangePreview() {
+  if (!previewPos) return;
+  const cx = (previewPos.slotIdx + 0.5) * pxPerUnit();
+  const r = rangeFor({ kind: previewPos.kindKey, lvl: 1 });
+  const dia = r * pxPerUnit() * 2;
+  rangeEl.style.width = dia + "px";
+  rangeEl.style.height = dia + "px";
+  rangeEl.style.left = cx + "px";
+}
+
 /* ---------------- wave flow ---------------- */
 
 function startWave() {
@@ -462,12 +548,22 @@ function startWave() {
   spawnT = 0;
   waveBtn.disabled = true;
   waveMsg.textContent = `Wave ${n}: ${queue.length} bores inbound. Hold the aisle.`;
+  waveAnnounce(n);
   const bar = $("wavebar");
   bar.classList.add("wave-flash");
   requestAnimationFrame(() => bar.classList.remove("wave-flash"));
   Audio.waveStart();
   Audio.bgmStart();
   save();
+}
+
+function waveAnnounce(n) {
+  const announce = document.createElement("div");
+  announce.id = "wave-announce";
+  announce.textContent = `WAVE ${n}`;
+  document.body.appendChild(announce);
+  requestAnimationFrame(() => announce.classList.add("show"));
+  setTimeout(() => { announce.remove(); }, 900);
 }
 
 function startNow(bonus) {
@@ -762,6 +858,7 @@ function restore() {
 function boot() {
   buildShop();
   measure();
+  applyTheme();
   const restored = restore();
   renderSlots();
   renderShop();
@@ -789,6 +886,14 @@ addEventListener("pagehide", save);
 if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
   navigator.serviceWorker.register("sw.js").catch(() => {});
 }
+
+/* theme cycling on double-tap of topbar brand (dev convenience) */
+document.querySelector(".brand").addEventListener("dblclick", () => {
+  sceneIdx++;
+  if (sceneIdx >= THEMES[themeIdx].scenes) { sceneIdx = 0; themeIdx++; }
+  if (themeIdx >= THEMES.length) { themeIdx = 0; }
+  applyTheme();
+});
 
 window.DDF = { get state() { return state; }, get bores() { return bores; } };
 

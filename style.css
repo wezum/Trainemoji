@@ -80,7 +80,7 @@ body {
 .btn-ghost:not(:disabled):hover { color: var(--white); border-color: var(--white); }
 
 /* ---------- board ---------- */
-#board { display: flex; flex-direction: column; gap: 10px; }
+#board { position: relative; display: flex; flex-direction: column; gap: 10px; }
 #lane-wrap { display: flex; gap: 8px; }
 #lane {
   position: relative;
@@ -363,6 +363,66 @@ dialog::backdrop { background: rgba(53, 41, 26, .45); }
 }
 #modal .btn.ghost { background: none; border: 2px solid var(--line-2); color: var(--ink-dim); font-weight: 700; }
 
+/* ---------- themes & scenes ---------- */
+body.theme-harz-autumn {
+  --bg: #3e2723; --navy: #5d4037; --panel: #4e342e; --line: #8d6e63;
+  --slot: #6d4c41; --ink: #d7ccc8; --ink-dim: #a1887f; --accent: #d4a373;
+  --good: #aed581; --bad: #e57373; --great: #ffcc80;
+}
+body.theme-harz-autumn.scene-1 { --bg: #4e342e; --navy: #3e2723; --panel: #5d4037; }
+body.theme-harz-autumn.scene-2 { --bg: #5d4037; --navy: #4e342e; --panel: #6d4c41; }
+body.theme-harz-autumn.scene-3 { --bg: #3e2723; --navy: #26140f; --panel: #4e342e; }
+
+body.theme-sakura {
+  --bg: #fce4ec; --navy: #f8bbd0; --panel: #f8bbd0; --line: #f48fb1;
+  --slot: #f48fb1; --ink: #880e4f; --ink-dim: #ad1457; --accent: #ec407a;
+  --good: #c2185b; --bad: #f48fb1; --great: #f8bbd0;
+}
+body.theme-sakura.scene-1 { --bg: #f8bbd0; --navy: #f48fb1; --panel: #fce4ec; }
+body.theme-sakura.scene-2 { --bg: #fce4ec; --navy: #f8bbd0; --panel: #f8bbd0; }
+body.theme-sakura.scene-3 { --bg: #f3e5f5; --navy: #e1bee7; --panel: #f3e5f5; }
+
+body.theme-alpine {
+  --bg: #e1f5fe; --navy: #b2ebf2; --panel: #b2ebf2; --line: #81d4fa;
+  --slot: #81d4fa; --ink: #01579b; --ink-dim: #0277bd; --accent: #ffffff;
+  --good: #0288d1; --bad: #b3e5fc; --great: #81d4fa;
+}
+body.theme-alpine.scene-1 { --bg: #b2ebf2; --navy: #81d4fa; --panel: #e1f5fe; }
+body.theme-alpine.scene-2 { --bg: #e1f5fe; --navy: #b2ebf2; --panel: #b2ebf2; }
+body.theme-alpine.scene-3 { --bg: #e3f2fd; --navy: #b3e5fc; --panel: #e3f2fd; }
+
+body.theme-harz-autumn .layer-far { background: repeating-linear-gradient(0deg, #5d4037 0, #5d4037 4%, transparent 4%, transparent 8%); }
+body.theme-harz-autumn .layer-mid { background: repeating-linear-gradient(0deg, #795548 0, #795548 3%, transparent 3%, transparent 7%); }
+body.theme-harz-autumn .layer-near { background: repeating-linear-gradient(0deg, #8d6e63 0, #8d6e63 2%, transparent 2%, transparent 6%); }
+
+body.theme-sakura .layer-far { background: repeating-linear-gradient(0deg, #f8bbd0 0, #f8bbd0 4%, transparent 4%, transparent 8%); }
+body.theme-sakura .layer-mid { background: repeating-linear-gradient(0deg, #f48fb1 0, #f48fb1 3%, transparent 3%, transparent 7%); }
+body.theme-sakura .layer-near { background: repeating-linear-gradient(0deg, #ec407a 0, #ec407a 2%, transparent 2%, transparent 6%); }
+
+body.theme-alpine .layer-far { background: repeating-linear-gradient(0deg, #b2ebf2 0, #b2ebf2 4%, transparent 4%, transparent 8%); }
+body.theme-alpine .layer-mid { background: repeating-linear-gradient(0deg, #81d4fa 0, #81d4fa 3%, transparent 3%, transparent 7%); }
+body.theme-alpine .layer-near { background: repeating-linear-gradient(0deg, #4fc3f7 0, #4fc3f7 2%, transparent 2%, transparent 6%); }
+
+/* parallax layers behind the lane */
+#parallax-wrap { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.parallax-layer { position: absolute; inset: 0; background-size: 300% 100%; animation: pan linear infinite; }
+.layer-far { animation-duration: 50s; opacity: .6; }
+.layer-mid { animation-duration: 25s; opacity: .5; }
+.layer-near { animation-duration: 12s; opacity: .4; }
+@keyframes pan { from { background-position: 0% 50%; } to { background-position: 100% 50%; } }
+
+/* kill particles */
+.particle { position: absolute; width: 7px; height: 7px; border-radius: 50%; pointer-events: none; animation: burst .6s ease-out forwards; z-index: 5; }
+@keyframes burst { from { transform: translate(0,0) scale(1); opacity: 1; } to { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; } }
+
+/* wave number flash */
+#wave-announce { position: fixed; left: 50%; top: 20vh; transform: translate(-50%, -50%) scale(.6); font: 800 32px ui-rounded, system-ui, sans-serif; color: var(--accent); text-shadow: 0 2px 10px rgba(0,0,0,.35); opacity: 0; pointer-events: none; z-index: 60; transition: transform .3s ease, opacity .3s ease; white-space: nowrap; }
+#wave-announce.show { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+
+/* defence range preview */
+.range-preview { position: absolute; border: 2px dashed var(--accent); border-radius: 50%; pointer-events: none; z-index: 0; transform: translate(-50%, -50%); transition: transform .05s, border-color .1s, opacity .2s; mix-blend-mode: screen; opacity: 0; }
+.range-preview.visible { opacity: .65; }
+
 @media (min-width: 700px) {
   .brand { flex: none; margin-right: auto; }
   #topbar { flex-wrap: nowrap; }
@@ -416,6 +476,9 @@ dialog::backdrop { background: rgba(53, 41, 26, .45); }
   .shop-item { transition: none; }
   .pill.pop, #wavebar.wave-flash { animation: none; }
   .lane-shake, #seat.critical { animation: none; }
+  .parallax-layer { animation: none; }
+  .particle { animation: none; }
+  #wave-announce { transition: none; }
 }
 
 /* ---------- audio settings dialog ---------- */
