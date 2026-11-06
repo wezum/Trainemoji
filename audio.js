@@ -109,7 +109,7 @@ const Audio = (() => {
     const gain = c.createGain();
     osc.type = "square";
     osc.frequency.setValueAtTime(entry.f, bgmT);
-    const g = 0.05 * state.music * state.master;
+    const g = 0.12 * state.music * state.master;
     gain.gain.setValueAtTime(g, bgmT);
     gain.gain.exponentialRampToValueAtTime(0.001, bgmT + dur);
     osc.connect(gain);

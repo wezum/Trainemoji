@@ -592,7 +592,6 @@ function endWave() {
     bestWave = state.wave;
     localStorage.setItem(LS_BEST, String(bestWave));
   }
-  Audio.bgmStop();
   Audio.waveClear();
   floatyAt(4, `+💰${bonus} wave clear`, "cash");
   save();
@@ -783,6 +782,7 @@ document.addEventListener(
     if (!audioUnlocked) {
       audioUnlocked = true;
       Audio.init();
+      Audio.bgmStart(); // start the train music on first tap
     }
   },
   { once: true }
