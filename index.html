@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Delay D">
+  <meta name="theme-color" content="#fbf3e4">
+  <title>Delay Defence Force</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230e0f13'/><text y='.9em' font-size='78'>🛡️</text></svg>">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main id="app">
+
+    <header id="topbar">
+      <div class="brand">
+        <span class="brand-mark">🛡️</span>
+        <span class="brand-name">Delay Defence Force</span>
+      </div>
+      <div id="stats">
+        <span class="pill" id="stat-money" title="Snack money">💰 <b>0</b></span>
+        <span class="pill" id="stat-wave" title="Waves cleared">🚂 <b>Wave 0</b></span>
+        <span class="pill" id="stat-sanity" title="Your sanity">🧠 <b>10</b></span>
+      </div>
+      <div class="controls">
+        <button class="btn-ghost" id="btn-help" title="How to play">?</button>
+        <button class="btn-ghost" id="btn-speed" title="Game speed">×1</button>
+        <button class="btn-ghost" id="btn-pause" title="Pause">⏸</button>
+      </div>
+    </header>
+
+    <section id="board">
+      <div id="lane-wrap">
+        <div id="lane">
+          <div id="slots"></div>
+          <div id="bores"></div>
+          <div id="snack" hidden>🧁</div>
+        </div>
+        <div id="seat"><span>🧍</span><em>your seat</em></div>
+      </div>
+      <div id="slotpanel" hidden>
+        <div id="slotpanel-info"></div>
+        <div class="slotpanel-actions">
+          <button class="btn small" id="btn-upgrade">Upgrade</button>
+          <button class="btn small warn" id="btn-sell">Sell</button>
+          <button class="btn small ghost" id="btn-slot-close">Close</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="shop" aria-label="Defences"></section>
+
+    <footer id="wavebar">
+      <div id="wave-msg">A calm carriage. For now.</div>
+      <button id="btn-wave" class="btn big">Start wave 1</button>
+    </footer>
+
+  </main>
+
+  <dialog id="modal"></dialog>
+
+  <script src="game.js"></script>
+</body>
+</html>
